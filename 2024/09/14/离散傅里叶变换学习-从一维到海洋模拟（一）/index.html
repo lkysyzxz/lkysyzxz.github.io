@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>离散傅里叶变换学习-从一维到海洋模拟（一） | 寒江雪</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="离散傅里叶变换学习-从一维到海洋模拟（一） | 寒江雪">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="about">
+<meta property="og:url" content="http://example.com/about/index.html">
+<meta property="og:site_name" content="寒江雪">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-09-13T19:12:18.000Z">
+<meta property="article:modified_time" content="2024-09-14T10:48:16.284Z">
+<meta property="article:author" content="寒江雪">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="icon" href="/img/avatar.jpg">
+
+<link href="/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/css/hl_theme/atom-light.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/img/avatar.jpg"/>
+</a>
+<div class="author">
+    <span>寒江雪</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/lkysyzxz"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="juejin"
+               href="https://juejin.cn/user/2859199581919912"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-juejin"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:lkysyzxz@outlook.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=924258179&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(1)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+        
+    
+        
+            
+                
+    <li>
+        <div data-rel="渲染">
+            <i class="fold iconfont icon-right"></i>
+            渲染
+            <small>(1)</small>
+        </div>
+        
+            <ul class="sub hide">
+                
+                    
+    <li>
+        <div data-rel="渲染&lt;---&gt;海洋模拟">
+            
+            海洋模拟
+            <small>(1)</small>
+        </div>
+        
+    </li>
+
+                
+            </ul>
+        
+    </li>
+
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="1">
+
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        
+        <a  class="全部文章 渲染 海洋模拟 "
+           href="/2024/09/14/%E7%A6%BB%E6%95%A3%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E5%AD%A6%E4%B9%A0-%E4%BB%8E%E4%B8%80%E7%BB%B4%E5%88%B0%E6%B5%B7%E6%B4%8B%E6%A8%A1%E6%8B%9F%EF%BC%88%E4%B8%80%EF%BC%89/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="离散傅里叶变换学习-从一维到海洋模拟（一）">离散傅里叶变换学习-从一维到海洋模拟（一）</span>
+            <span class="post-date" title="2024-09-14 15:46:39">2024/09/14</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-离散傅里叶变换学习-从一维到海洋模拟（一）" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">离散傅里叶变换学习-从一维到海洋模拟（一）</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="渲染">渲染</a> > 
+            
+            <a  data-rel="渲染&lt;---&gt;海洋模拟">海洋模拟</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2024-09-14 20:00:55'>2024-09-14 15:46</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A6%BB%E6%95%A3%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">离散傅里叶变换的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E7%BB%B4%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2"><span class="toc-text">一维傅里叶变换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E7%BB%B4%E7%A6%BB%E6%95%A3%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84%E9%80%86%E5%8F%98%E6%8D%A2"><span class="toc-text">一维离散傅里叶变换的逆变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C-%E5%AE%9E%E7%8E%B0%E4%B8%80%E7%BB%B4%E7%A6%BB%E6%95%A3%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2"><span class="toc-text">C++实现一维离散傅里叶变换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E7%BB%B4%E7%A6%BB%E6%95%A3%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E5%8F%8A%E5%85%B6%E9%80%86%E5%8F%98%E6%8D%A2"><span class="toc-text">二维离散傅里叶变换及其逆变换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">参考资料</span></a></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="离散傅里叶变换的实现"><a href="#离散傅里叶变换的实现" class="headerlink" title="离散傅里叶变换的实现"></a>离散傅里叶变换的实现</h1><p>  最近在朋友的点拨下，以及通过网上查阅的一些资料来看，实现了一维离散傅里叶变换到二维离散傅里叶变换，以至于到FFT的实现及相应的逆变换。对傅里叶变换这个很长时间以来都没有理解的东西，有了一个深刻的认识。所以就想总结一下其中的原理以及具体的实现过程。</p>
+<p>  本文将会从一维离散傅里叶变换开始，逐步讲解到FFT的实现及相应逆变换的实现方法。以及FFT实现时使用的蝶形变换的具体操作方法。其中，还会罗列出所参考的资料。</p>
+<h2 id="一维傅里叶变换"><a href="#一维傅里叶变换" class="headerlink" title="一维傅里叶变换"></a>一维傅里叶变换</h2><p>  在实际操作之前，一定要有一个重要的认知，那就是傅里叶变换本质上是把一个函数转换成用另一种形式来表示。这就是经常说的，时域信号转成频域信号。但这都不重要，数学公式上来看，傅里叶公式如下，即等号左边的f(x)可以表示成等号右边的一个和式，这个公式的通俗解释就是，一个函数可以表示成正弦函数和余弦函数的和。而其中an和bn表示的就是一个权值。</p>
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f819fed0a23b4c5890a9a05f1849e340~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=450&amp;h=74&amp;s=8710&amp;e=png&amp;b=fefefe" alt="image-20230821015622178.png"></p>
+<p>  an和bn也是可以通过公式计算得到的，公式如下，可以看到是两个积分式。</p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9fc76fb5ac5d409fad1c307ab912d052~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=298&amp;h=75&amp;s=9425&amp;e=png&amp;b=fdfdfd" alt="image-20230821020020904.png"></p>
+<p>  总结这两个公式，可以获得一个认知：</p>
+<ul>
+<li>一个函数可以表示成不同频率的正弦函数和余弦函数的加权和。权值可以通过公式计算。</li>
+<li><strong>只要确定了权值an和bn</strong>，结合第一个公式，通过对不同频率的正弦函数和余弦函数进行加权求和，我们可以算出来对应f(x)的值。</li>
+</ul>
+<p>  这里面有一个容易被忽视的点，那就是不同频率的正弦函数和余弦函数的组合，<strong>是固定的</strong>。所以最后只要确定权值an和bn即可，至此就可以知道，对一个函数进行傅里叶变换，要做的事情就是确定an和bn的值。通过手动计算当然很难，但是借助计算机却是可以的，对于原函数很难确定的积分公式，计算机也只能进行离散地计算以获得一个趋近于正确答案的结果，只要误差允许范围内，这没什么大问题。</p>
+<p>  DFT做的事情，主要是<strong>在长度为N的离散信号中，针对k=(0,1,2…)，分别找出在长度N内振动k个周期的三角波分量的权值</strong>。举个例子，针对某个余弦信号，在两个周期内采样40次：</p>
+<script type="math/tex; mode=display">
+x[n] = cos(2\pi\frac{n}2),n = 0,1,...,39</script><p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0030c12deeb14534ade696fe0267f1ab~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=1857&amp;h=27&amp;s=4363&amp;e=png&amp;b=0d0d0d" alt="image-20240421212400761.png"></p>
+<p>  然后通过DFT可以知道它在40次采样周期内，震动了几个周期。算法的处理很暴力：</p>
+<p>  首先，选取40个长度为40个点的基信号，它们分别长这样：</p>
+<script type="math/tex; mode=display">
+cos(2\pi\frac{0n}{40}),cos(2\pi\frac{n}{40}),cos(2\pi\frac{2n}{40})...cos(2\pi\frac{39n}{40})</script><p>  第一个，40次采样内振动0个周期：$cos(2\pi\frac{0n}{40})$，即常值:</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7b14ee177dad454f8067f51abf94c59e~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=492\&amp;h=383\&amp;s=7806\&amp;e=webp\&amp;b=f2fefe" alt="img"></p>
+<p>  第二个，40次采样内振动1个周期：$cos(2\pi\frac{n}{40})$</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd371129b1c04a278ed2b48c823eb435~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=487\&amp;h=388\&amp;s=7748\&amp;e=webp\&amp;b=fbfbfb" alt="img"></p>
+<p>  以此类推，一直到40个采样内振动39个周期。</p>
+<p>  接下来，对于上述每个基信号，判断它们跟原信号的相关程度，就是用他们在同一点的函数值相乘，并对结果求和（向量的内积），即如下的公式：</p>
+<script type="math/tex; mode=display">
+correlation(x,y) = \Sigma_k x[k]y[k]</script><p>  这个值越大，则x[k]与y[k]越像。于是DFT把$cos(2\pi\frac{0n}{40})$到$cos(2\pi\frac{39n}{40})$这40个基函数与当前函数$cos(2\pi\frac{2n}{40})$比较了一下，发现$cos(2\pi\frac{2n}{40})$和$\cos(2\pi\frac{38n}{40})$长得最像。</p>
+<p>  这也和那显然，因为$cos(2\pi\frac{38n}{40}) = cos(2\pi n-2\pi \frac{38n}{40}) = cos(2\pi \frac{2n}{40})$</p>
+<p>  下面，如果我们把这40次每次比较的correlation值记下来，就得到了原信号在每个频率上的分量大小。就得到了所谓原信号的频域X：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c3461262b85940a1af79af794c1a8594~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=487\&amp;h=384\&amp;s=5890\&amp;e=webp\&amp;b=fcfcfc" alt="img"></p>
+<p>  如果用频域信号替换原信号，则：</p>
+<script type="math/tex; mode=display">
+X_k = \sum_{n=0}^{N-1}x[n]cos(2\pi \frac{kn}{N}), (N=40)</script><p>  问题来了，虽然貌似联系很紧密，但这怎么跟DFT的公式长得不一样。。。DFT的公式应该是这样的：</p>
+<script type="math/tex; mode=display">
+X_k = \sum_{n=0}^{N-1} x[n]e^{-2\pi j \frac{kn}{N}}</script><p>  用欧拉公式展开，我们得到的时：</p>
+<script type="math/tex; mode=display">
+X_k = \sum_{n-0}^{N-1} x[n]cos(2\pi \frac{kn}{N}) - j\sum_{n=0}^{N-1}x[n]sin(2\pi \frac{kn}{N})</script><p>  这又是为什么呢？这是因为，对于一个信号，如果只跟余弦函数比较，会损失一些信息，比如相位。如果原信号有一些相位偏移，$x = cos(2\pi \frac{2n}{40} + \frac{\pi}{4})$</p>
+<p>  对这个函数同样按照上面的方法计算频域，结果会有些不一样:</p>
+<script type="math/tex; mode=display">
+X_2 = X_38 = \sum_{n=0}^{39}cos(2\pi\frac{2n}{40} + \frac{\pi}{4})cos(2\pi \frac{2n}{40}) = 10\sqrt2</script><p>  如果再找一个信号y, 没有相位偏移，而是把幅值砍到$\frac{\sqrt2}{2}$，即:</p>
+<script type="math/tex; mode=display">
+y = \frac{\sqrt 2}{2} cos(2\pi \frac{2n}{40})</script><p>  那么这个信号的DFT结果：</p>
+<script type="math/tex; mode=display">
+Y_2 = Y_38 = \sum_{n=0}^{39}\frac{\sqrt 2}{2}cos(2\pi\frac{2n}{40})cos(2\pi\frac{2n}{40})=10\sqrt2</script><p>  跟x信号的记过一模一样，这样就由于损失信息，无法通过频域恢复信号了。</p>
+<p>  解决方法是另选一组以正弦函数（实际上选了负正弦）为基准的“基信号”，即$-sin(2\pi\frac{0n}{40})$到 $-sin(2\pi\frac{39n}{40})$，计算另一组原信号与正弦基的相关系数，这两组系数一起作为DFT的最终结果。而复数只是一个工具，用来方便地同时存储两组计算结果。当然它还有一个好处就是能够比较直观地表现出模和相位。</p>
+<p>  选负正弦还是正弦做基信号其实无所谓，只是最后的结果算出来的相位反一下而已，幅值是一样的。如果一个信号跟某频率余弦和负正弦的相关系数分别为a,b，那么代表这个信号差不多型如：</p>
+<script type="math/tex; mode=display">
+acos(\frac{kn}{N}) - bsin(\frac{kn}{N})</script><p>  根据高中数学可以求得其模为$\sqrt{a^2+b^2}$，相对余弦的相位为$arctan(\frac{b}{a})$，这与复数$a+bi$的模和相位是相同的，因此DFT的公式相当于同时把x[n]做了跟N个余弦基、N个负正弦基的比对，结果用N个复数存储。如果想要看某个频率的相位和模，就看对应复数的相位和模。</p>
+<p>  我们再来看看上面有相位偏移的那个例子：</p>
+<p>  原信号：$x[n] = cos(2\pi\frac{2n}{40} + \frac{\pi}{4})$</p>
+<p>  与余弦比对：$X<em>2 = \sum</em>{n=0}^{39}cos(2\pi\frac{2n}{40}+\frac{\pi}{4})cos(2\pi\frac{2n}{40})=10\sqrt{2}$</p>
+<p>  与负正弦比对：$X<em>2=\sum</em>{n=0}{39}cos(2\pi\frac{2n}{40} + \frac{\pi}{4})sin(-2\pi\frac{2n}{40})=10\sqrt{2}$</p>
+<p>  在40个点内振动两个周期这个频率上，其DFT的结果为$10\sqrt{2}+10\sqrt{2}j$</p>
+<p>  其模为20，与其相位偏移前相同</p>
+<p>  其相位也为$\frac{\pi}{4}$，也没有问题</p>
+<p>  如果将原信号变为$x[n]=sin(2\pi\frac{2n}{40}+\frac{\pi}{4})$,会求得该频率DFT结果为$10\sqrt{2}-10\sqrt{2}j$，求得其相位为$-\frac{\pi}{4}$。因此，根据DFT结果求得的相位是相对余弦信号的相位。****</p>
+<h3 id="一维离散傅里叶变换的逆变换"><a href="#一维离散傅里叶变换的逆变换" class="headerlink" title="一维离散傅里叶变换的逆变换"></a>一维离散傅里叶变换的逆变换</h3><p>  一维离散傅里叶逆变换的公式如下：</p>
+<p>  具体的公式推导我不太理解，所以就不讲了。其中，要还原的目标，即原函数的值。则是由经过DFT变换得到的结果，即一组各个频率正交基的系数。当初在大学期间，看这个公式时，有一个很疑惑的点是左边的值是一个实数，右边的公式中是DFT的结果，看着也像是实数，然后又是一个e的指数形式，很困惑。这个疑惑不知道大家有没有，这里就特别提一下，在这个公式中，其实是复数。是DFT的结果，也是复数，而，由欧拉公式可以知道，也是复数。所以这个公式中右边部分是复数相乘并求和的结果，左边自然是也是复数。<strong>最后的得到的复数，实部就是我们想要的结果，虚部会计算变为0</strong></p>
+<h3 id="C-实现一维离散傅里叶变换"><a href="#C-实现一维离散傅里叶变换" class="headerlink" title="C++实现一维离散傅里叶变换"></a>C++实现一维离散傅里叶变换</h3><p>  <a target="_blank" rel="noopener" href="https://gitee.com/learn-fft/dftwith-cpp">示例代码仓库地址</a></p>
+<h2 id="二维离散傅里叶变换及其逆变换"><a href="#二维离散傅里叶变换及其逆变换" class="headerlink" title="二维离散傅里叶变换及其逆变换"></a>二维离散傅里叶变换及其逆变换</h2><p>  二维离散傅里叶变换的公式有一维离散傅里叶变换相比，就是多了一层求和，公式如下：</p>
+<p>  逆变换的公式如下：</p>
+<p>  在代码的实现上，就是从两层循环，变成了4层循环。我用一张图片作为例子，来实现二维离散傅里叶变换及其逆变换。程序加载图片但只对它的R通道进行处理，将傅里叶变换的结果输出成图像。并将逆变换的结果输出成图像，和原图像进行对比。</p>
+<p>  程序需要依赖stb_image.h及stb_image_write.h图形库，具体的使用方法可以直接参考代码的示例。图片用的是缩小版本的lena的照片，不过只取了R通道。</p>
+<p>  <img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5689b26f62b545548bb577ea4c9d1047~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=128&amp;h=128&amp;s=5989&amp;e=jpg&amp;b=d9d9d9" alt="rchannel_origin.jpeg"></p>
+<p>  首先实现一个Image的类，用于对图形数据的提取，下面的图给出类的声明、构造和析构方法。实现加载图片的逻辑。加载出来的图片，用一维浮点数组保存，且拆分成RGB三个通道，索引时根据x和y计算整数索引来取数图片中的值。在这篇示例中，只需要关注R通道即可。</p>
+<p>  <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fcbfa6b652ba4f318db8d6ba227cbda1~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=832&amp;h=888&amp;s=389759&amp;e=png&amp;b=242224" alt="image-20240424034314557.png"></p>
+<p>  在main函数里，使用刚刚定义的类实现加载和保存的逻辑。</p>
+<p>  <img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/665eb1b50c9745a994c7eede2bf752f0~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=381&amp;h=164&amp;s=28174&amp;e=png&amp;b=242224" alt="image-20240424034926498.png"></p>
+<p>  然后我们需要在加载图片之后，实现DFT方法，并将结果保存为<code>dft_result.png</code>。</p>
+<p>  <img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2c3135d845f84856a6c25a09f68a9d5f~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=1392&amp;h=725&amp;s=445769&amp;e=png&amp;b=242224" alt="image-20240424041756626.png"></p>
+<p>  如果将DFT的模输出成图像，是下面这张图</p>
+<p>  <img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0cce120bf5f04d1caa78f640c55dc873~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=128&amp;h=128&amp;s=38380&amp;e=png&amp;b=808080" alt="dft_result.png"></p>
+<p>  为了让其显像，做一个取对数的操作，是下面这张图。</p>
+<p>  <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/675721ef821e424884bc03e8d10c1f1f~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=128&amp;h=128&amp;s=4242&amp;e=jpg&amp;b=353535" alt="dft_result.jpeg"></p>
+<p>  这也和我们常见频谱图像有区别，而如何从上面这张图变换得到下面这张图，下文再进行介绍。</p>
+<p>  <img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3a91ceb810354cecad9b1b060d996460~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=512&amp;h=512&amp;s=56996&amp;e=jpg&amp;b=363636" alt="temp_specturm.jpeg"></p>
+<p>  接着实现IDFT方法，并将结果保存为<code>output.png</code>。</p>
+<p>  <img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/97775e55a4d14625a9b4e3c096bb8d29~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=1162&amp;h=524&amp;s=282074&amp;e=png&amp;b=242124" alt="image-20240426003211969.png"></p>
+<p>  可以看到，输出的结果与原图一致。如下图是转换过程，最左边是原图，最右边是复原图，中间是DFT的结果。肉眼无法分辨出差别，而实际上，两张图的差值是0。</p>
+<p>  <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a4816a98ab6a4a3d98071229ff433b43~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=621&amp;h=157&amp;s=56161&amp;e=png&amp;b=e4e4e4" alt="image-20240426003859331.png"></p>
+<p>  而对于下面这张频谱图像的获得，实际上是对DFT的结果做了一些操作。并且对图像进行处理，使其能够显像，这在冈萨雷斯的《数字图像处理》一书中也有体现。代码就不贴了，可以看Image类的<code>GenerateSpectrum</code>方法。</p>
+<p>  <img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3a91ceb810354cecad9b1b060d996460~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=512&amp;h=512&amp;s=56996&amp;e=jpg&amp;b=363636" alt="temp_specturm.jpeg"></p>
+<p>  <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e9937fef623945f68449ee7a3f3b3f40~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=725&amp;h=64&amp;s=51429&amp;e=png&amp;b=fafafa" alt="image-20240426005927487.png"></p>
+<p>  <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/40ca59fa56ed4766937feb9715b68fa5~tplv-k3u1fbpfcp-jj-mark:0:0:0:0:q75.image#?w=681&amp;h=550&amp;s=161133&amp;e=png&amp;b=fdfdfd" alt="image-20240426005946805.png"></p>
+<p>  所以，对于DFT结果和频谱图像之间的关系，就讲清楚了。其实如果只是写程序实现这个过程，频谱图像是不必要关心的，但是频谱图像对于。更应该关注的是DFT的结果是如何存储的，以及如何复原原图像。下面要介绍的FFT利用一些定理对DFT加速，得到的结果和DFT一致。二维DFT的代码也上传到仓库里。</p>
+<p>  <a target="_blank" rel="noopener" href="https://gitee.com/learn-fft/dft2">二维离散傅里叶变换的代码仓库</a></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21314374/answer/542909849?utm_source=qq">如何通俗地解释什么是离散傅里叶变换？ - 知乎 (zhihu.com)</a></p>
+
+      
+       <hr><center><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以邮件 </span></center>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <!-- <p class="footer-entry">
+    ©2016-2020 Yelog
+</p>
+<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p> -->
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+
+    
+
+</body>
+<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+    .nav-right:before {
+        content: ' ';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.3;
+        background: url("https://i.loli.net/2019/07/22/5d3521411f3f169375.png");
+        background-repeat: no-repeat;
+        background-position: 50% 0;
+        -ms-background-size: cover;
+        -o-background-size: cover;
+        -moz-background-size: cover;
+        -webkit-background-size: cover;
+        background-size: cover;
+    }
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>
